@@ -641,5 +641,14 @@ def pluralize_views(count):
     else:
         return f"{count} просмотров"
 
+@app.route('/init-db')
+def init_db_route():
+    from db import init_db
+    try:
+        init_db()
+        return "База данных успешно инициализирована!"
+    except Exception as e:
+        return f"Ошибка: {e}"
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
