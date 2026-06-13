@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        {% if book.cover_filename %}
+<img src="{{ url_for('static', filename='uploads/' + book.cover_filename.replace('\\', '/')) }}" class="img-fluid rounded shadow" alt="{{ book.title }}">
+{% else %}
+        <div class="bg-secondary text-white d-flex align-items-center justify-content-center rounded" style="height: 300px;">
+            <h3>📖 Нет обложки</h3>
+        </div>
+        {% endif %}
+    </div>
+    <div class="col-md-8">
+        <h1>{{ book.title }}</h1>
+        <p class="text-muted">
+            <strong>Автор:</strong> {{ book.author }}<br>
+            <strong>Год:</strong> {{ book.year }}<br>
+            <strong>Издательство:</strong> {{ book.publisher }}<br>
+            <strong>Страниц:</strong> {{ book.pages }}<br>
+            <strong>Жанры:</strong> {{ book.genres_list|join(', ') }}
+        </p>
+        <hr>
+        <h5>Описание</h5>
+        <div class="book-description">
+            {{ book.description_html|safe }}
+        </div>
+    </div>
+</div>
+
+<!-- Рецензии -->
+<hr class="my-5">
+<h3>📝 Рецензии</h3>
+
+{% if user and not user_review and user.role_name in ['user', 'moderator', 'admin'] %}
+<div class="alert alert-info">
+    <a href="{{ url_for('add_review', book_id=book.id) }}" class="btn btn-primary">Написать рецензию</a>
+</div>
+{% endif %}
+
+{% if reviews %}
+    {% for review in reviews %}
+    <div class="card mb-3">
+        <div class="card-header">
+            <strong>{{ review.user_fullname }}</strong>
+            <span class="float-end">
+                {% for i in range(review.rating) %}⭐{% endfor %}
+                {% for i in range(5 - review.rating) %}☆{% endfor %}
+                ({{ review.rating }}/5)
+            </span>
+        </div>
+        <div class="card-body">
+            {{ review.text_html|safe }}
+            <small class="text-muted">{{ review.created_at.strftime('%d.%m.%Y %H:%M') }}</small>
+        </div>
+    </div>
+    {% endfor %}
+{% else %}
+    <p class="text-muted">Пока нет рецензий. Будьте первым!</p>
+{% endif %}
+
+{% if user_review %}
+<div class="card border-success mb-3">
+    <div class="card-header bg-success text-white">
+        <strong>Ваша рецензия</strong>
+        <span class="float-end">{% for i in range(user_review.rating) %}⭐{% endfor %}</span>
+    </div>
+    <div class="card-body">
+        {{ user_review.text_html|safe }}
+    </div>
+</div>
+{% endif %}
+{% endblock %}

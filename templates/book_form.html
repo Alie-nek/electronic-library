@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3>{% if book %}Редактирование книги{% else %}Добавление книги{% endif %}</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Название *</label>
+                        <input type="text" class="form-control" id="title" name="title" value="{{ book.title if book else '' }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="author" class="form-label">Автор *</label>
+                        <input type="text" class="form-control" id="author" name="author" value="{{ book.author if book else '' }}" required>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="year" class="form-label">Год *</label>
+                                <input type="number" class="form-control" id="year" name="year" value="{{ book.year if book else '' }}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="pages" class="form-label">Страниц *</label>
+                                <input type="number" class="form-control" id="pages" name="pages" value="{{ book.pages if book else '' }}" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="publisher" class="form-label">Издательство *</label>
+                        <input type="text" class="form-control" id="publisher" name="publisher" value="{{ book.publisher if book else '' }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="genres" class="form-label">Жанры *</label>
+                        <select class="form-control" id="genres" name="genres" multiple size="5" required>
+                            {% for genre in genres %}
+                            <option value="{{ genre.id }}" {% if selected_genres and genre.id|string in selected_genres %}selected{% endif %}>
+                                {{ genre.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <small class="text-muted">Удерживайте Ctrl для выбора нескольких жанров</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Описание (можно использовать Markdown) *</label>
+                        <textarea class="form-control markdown" id="description" name="description" rows="10">{{ book.description if book else '' }}</textarea>
+                    </div>
+                    
+                    {% if not book %}
+                    <div class="mb-3">
+                        <label for="cover" class="form-label">Обложка *</label>
+                        <input type="file" class="form-control" id="cover" name="cover" accept="image/*" required>
+                    </div>
+                    {% endif %}
+                    
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                    <a href="{{ url_for('index') }}" class="btn btn-secondary">Отмена</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

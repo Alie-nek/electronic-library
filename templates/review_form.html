@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card">
+            <div class="card-header">
+                <h3>Рецензия на книгу "{{ book.title }}"</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="rating" class="form-label">Оценка *</label>
+                        <select class="form-select" id="rating" name="rating" required>
+                            <option value="5">Отлично</option>
+                            <option value="4">Хорошо</option>
+                            <option value="3">Удовлетворительно</option>
+                            <option value="2">Неудовлетворительно</option>
+                            <option value="1">Плохо</option>
+                            <option value="0">Ужасно</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="text" class="form-label">Текст рецензии (можно использовать Markdown)</label>
+                        <textarea class="form-control markdown" id="text" name="text" rows="10"></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Сохранить рецензию</button>
+                    <a href="{{ url_for('book_detail', book_id=book.id) }}" class="btn btn-secondary">Отмена</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

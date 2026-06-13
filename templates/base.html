@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📚 Электронная библиотека</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                📚 Электронная библиотека
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    {% if user and user.role_name == 'admin' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('statistics') }}">
+                            📊 Статистика
+                        </a>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        {% if user %}
+                            <span class="nav-link text-white-50">
+                                🌟 {{ user.last_name }} {{ user.first_name }} {{ user.middle_name or '' }}
+                            </span>
+                        {% endif %}
+                    </li>
+                    <li class="nav-item">
+                        {% if user %}
+                            <a class="btn btn-outline-light btn-sm ms-2" href="{{ url_for('logout') }}">Выйти</a>
+                        {% else %}
+                            <a class="btn btn-outline-light btn-sm ms-2" href="{{ url_for('login') }}">Войти</a>
+                        {% endif %}
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="container mt-4">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category if category != 'message' else 'info' }} alert-dismissible fade show shadow-sm rounded-3">
+                    <i class="fas fa-{% if category == 'success' %}check-circle{% elif category == 'danger' %}exclamation-triangle{% else %}info-circle{% endif %} me-2"></i>
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endwith %}
+        
+        {% block content %}{% endblock %}
+    </div>
+    
+    <footer>
+        <div class="container">
+            <p><strong>Группа: 241-326 | Студентка: Новоселова Мария Викторовна</strong></p>
+            <p class="small opacity-75">© 2026 Электронная библиотека</p>
+        </div>
+    </footer>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
+    <script>
+        document.querySelectorAll('textarea.markdown').forEach(textarea => {
+            new EasyMDE({ 
+                element: textarea,
+                toolbar: ["bold", "italic", "heading", "|", "quote", "code", "unordered-list", "ordered-list", "|", "link", "image", "|", "preview", "side-by-side", "fullscreen", "|", "guide"]
+            });
+        });
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>
