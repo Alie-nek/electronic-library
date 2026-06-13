@@ -646,14 +646,6 @@ def serve_static(filename):
     from flask import send_from_directory
     return send_from_directory('static', filename)
 
-@app.route('/init-db')
-def init_db_route():
-    from db import init_db
-    try:
-        init_db()
-        return "База данных успешно инициализирована! Таблицы созданы."
-    except Exception as e:
-        return f"Ошибка при инициализации: {str(e)}"
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
