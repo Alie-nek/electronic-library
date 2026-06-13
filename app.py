@@ -187,11 +187,10 @@ def index():
                (SELECT AVG(rating) FROM reviews WHERE book_id = b.id) as avg_rating,
                (SELECT COUNT(*) FROM reviews WHERE book_id = b.id) as reviews_count,
                GROUP_CONCAT(DISTINCT g.name SEPARATOR ', ') as genres,
-               c.filename as cover_filename
+               (SELECT filename FROM covers WHERE book_id = b.id LIMIT 1) as cover_filename
         FROM books b
         LEFT JOIN book_genres bg ON b.id = bg.book_id
         LEFT JOIN genres g ON bg.genre_id = g.id
-        LEFT JOIN covers c ON b.id = c.book_id
         GROUP BY b.id
         ORDER BY b.year DESC, b.id DESC
         LIMIT %s OFFSET %s
