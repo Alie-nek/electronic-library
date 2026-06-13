@@ -1,14 +1,39 @@
 import mysql.connector
-from config import Config
+from mysql.connector import Error
+import os
+import re
 
 def get_db_connection():
+    database_url = os.environ.get('DATABASE_URL')
+    
+    if not database_url:
+        from config import Config
+        return mysql.connector.connect(
+            host=Config.MYSQL_HOST,
+            user=Config.MYSQL_USER,
+            password=Config.MYSQL_PASSWORD,
+            database=Config.MYSQL_DATABASE,
+            autocommit=False,
+            use_pure=True
+        )
+   
+    pattern = r'mysql://([^:]+):([^@]+)@([^:]+):(\d+)/([^?]+)'
+    match = re.match(pattern, database_url)
+    
+    if not match:
+        raise Exception(f"Не удалось распарсить DATABASE_URL: {database_url[:50]}...")
+    
+    user, password, host, port, database = match.groups()
+    
     return mysql.connector.connect(
-        host=Config.MYSQL_HOST,
-        user=Config.MYSQL_USER,
-        password=Config.MYSQL_PASSWORD,
-        database=Config.MYSQL_DATABASE,
+        host=host,
+        user=user,
+        password=password,
+        database=database,
+        port=int(port),
         autocommit=False,
-        use_pure=True
+        use_pure=True,
+        ssl_disabled=False  
     )
 
 def init_db():
@@ -38,9 +63,9 @@ def init_db():
         CREATE TABLE IF NOT EXISTS book_genres (
             book_id INT,
             genre_id INT,
-            PRIMARY KEY (book_id, genre_id),
             FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE,
-            FOREIGN KEY (genre_id) REFERENCES genres(id) ON DELETE CASCADE
+            FOREIGN KEY (genre_id) REFERENCES genres(id) ON DELETE CASCADE,
+            PRIMARY KEY (book_id, genre_id)
         )
     ''')
     
@@ -107,8 +132,8 @@ def init_db():
     
     cursor.execute("SELECT COUNT(*) FROM roles")
     if cursor.fetchone()[0] == 0:
-        cursor.execute("INSERT INTO roles (name, description) VALUES ('admin', 'Администратор - полный доступ к системе')")
-        cursor.execute("INSERT INTO roles (name, description) VALUES ('moderator', 'Модератор - может редактировать книги и модерировать рецензии')")
+        cursor.execute("INSERT INTO roles (name, description) VALUES ('admin', 'Администратор - полный доступ')")
+        cursor.execute("INSERT INTO roles (name, description) VALUES ('moderator', 'Модератор - может редактировать книги')")
         cursor.execute("INSERT INTO roles (name, description) VALUES ('user', 'Пользователь - может оставлять рецензии')")
     
     cursor.execute("SELECT COUNT(*) FROM genres")
@@ -143,5 +168,3 @@ def init_db():
     conn.commit()
     cursor.close()
     conn.close()
-    
-  
